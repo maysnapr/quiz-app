@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, session
 import sqlite3
 import requests
-from googletrans import Translator
 import html
 import random
 
@@ -35,6 +34,7 @@ init_db()
 def home():
     return redirect('/login')
 
+# REGISTER
 @app.route('/register', methods=['GET','POST'])
 def register():
     if request.method == 'POST':
@@ -45,6 +45,7 @@ def register():
         return redirect('/login')
     return render_template('register.html')
 
+# LOGIN
 @app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':
@@ -56,62 +57,98 @@ def login():
             return redirect('/dashboard')
     return render_template('login.html')
 
+# LOGOUT
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/login')
 
+# DASHBOARD
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
         return redirect('/login')
     return render_template('dashboard.html')
 
+# ================= QUIZ =================
 @app.route('/quiz')
 def quiz():
     url = "https://opentdb.com/api.php?amount=5&type=multiple"
-    data = requests.get(url).json()
 
-    translator = Translator()
-    questions = data['results']
+    try:
+        response = requests.get(url, timeout=5)
+        data = response.json()
+        questions_raw = data.get('results', [])
+    except:
+        questions_raw = []
 
-    for q in questions:
-        # decode HTML
+    questions = []
+
+    for q in questions_raw:
         question = html.unescape(q['question'])
         correct = html.unescape(q['correct_answer'])
         incorrect = [html.unescape(ans) for ans in q['incorrect_answers']]
 
-        # translate ke Indonesia
-        q['question'] = translator.translate(question, dest='id').text
-        q['correct_answer'] = translator.translate(correct, dest='id').text
-        q['incorrect_answers'] = [translator.translate(ans, dest='id').text for ans in incorrect]
+        options = incorrect + [correct]
+        random.shuffle(options)
 
-        # gabung & acak jawaban
-        q['options'] = q['incorrect_answers'] + [q['correct_answer']]
-        random.shuffle(q['options'])
+        questions.append({
+            "question": question,
+            "options": options,
+            "correct_answer": correct
+        })
+
+    # 🔥 fallback kalau API gagal (biar tidak kosong saat demo)
+    if not questions:
+        questions = [
+            {
+                "question": "Apa ibu kota Indonesia?",
+                "options": ["Jakarta", "Bandung", "Surabaya", "Medan"],
+                "correct_answer": "Jakarta"
+            },
+            {
+                "question": "2 + 2 = ?",
+                "options": ["3", "4", "5", "6"],
+                "correct_answer": "4"
+            }
+        ]
 
     return render_template('quiz.html', questions=questions)
 
+# ================= SUBMIT =================
 @app.route('/submit', methods=['POST'])
 def submit():
     score = 0
+    review = []
 
     for key in request.form:
         if key.startswith("question_"):
             q_num = key.split("_")[1]
+
+            question = request.form.get(f"text_{q_num}")
             user_answer = request.form.get(key)
             correct_answer = request.form.get(f"correct_{q_num}")
 
-            if user_answer == correct_answer:
+            is_correct = user_answer == correct_answer
+
+            if is_correct:
                 score += 1
+
+            review.append({
+                "question": question,
+                "user_answer": user_answer,
+                "correct_answer": correct_answer,
+                "is_correct": is_correct
+            })
 
     db = get_db()
     db.execute("INSERT INTO quiz_results (user_id, score) VALUES (?,?)",
                (session['user_id'], score))
     db.commit()
 
-    return render_template('result.html', score=score)
+    return render_template('result.html', score=score, review=review)
 
+# ================= LEADERBOARD =================
 @app.route('/leaderboard')
 def leaderboard():
     db = get_db()
@@ -124,5 +161,6 @@ def leaderboard():
 
     return render_template('leaderboard.html', data=data)
 
+# ================= RUN =================
 if __name__ == '__main__':
     app.run(debug=True)

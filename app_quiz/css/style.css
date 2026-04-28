@@ -1,53 +1,25 @@
 body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to right, #667eea, #764ba2);
+    font-family: Arial;
+    background: linear-gradient(135deg, #667eea, #764ba2);
 }
 
-.card {
-    border-radius: 15px;
-    border: none;
-}
-
-.shadow {
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
+.container-box {
+    width: 350px;
+    margin: 100px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
 }
 
 .btn {
-    border-radius: 10px;
-    transition: 0.3s;
-}
-
-.btn:hover {
-    transform: scale(1.05);
-}
-
-.dashboard-title {
+    width: 100%;
+    padding: 10px;
+    background: #667eea;
     color: white;
+    border: none;
+    margin-top: 10px;
 }
 
-.dashboard-btn {
-    padding: 15px 25px;
-    font-size: 18px;
-}
-
-.quiz-question {
-    font-size: 18px;
-}
-
-.form-check:hover {
-    background-color: #f1f1f1;
-}
-
-.result-score {
-    font-size: 60px;
-    color: green;
-}
-
-.card {
-    animation: fadeIn 0.6s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from {opacity:0; transform:translateY(20px);}
-    to {opacity:1; transform:translateY(0);}
+a {
+    text-decoration: none;
 }

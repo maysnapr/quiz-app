@@ -6,24 +6,20 @@
 
 <form method="POST" action="/submit">
 {% for q in questions %}
-    <p class="quiz-question">{{ loop.index }}. {{ q.question }}</p>
-
     {% set q_index = loop.index %}
 
+    <p><b>{{ q_index }}. {{ q.question }}</b></p>
+
     {% for opt in q.options %}
-        <div class="form-check">
-            <input 
-                class="form-check-input"
-                type="radio"
-                name="question_{{ q_index }}"
-                value="{{ opt }}"
-                required
-            >
-            <label class="form-check-label">{{ opt }}</label>
+        <div>
+            <input type="radio" name="question_{{ q_index }}" value="{{ opt }}" required>
+            {{ opt }}
         </div>
     {% endfor %}
 
     <input type="hidden" name="correct_{{ q_index }}" value="{{ q.correct_answer }}">
+    <input type="hidden" name="text_{{ q_index }}" value="{{ q.question }}">
+
     <br>
 {% endfor %}
 
