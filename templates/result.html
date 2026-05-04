@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hasil Quiz — QuizApp</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --bg:#090e1a; --bg-card:#0f1726; --accent:#00f5c4; --accent2:#7b61ff; --accent3:#ff6b6b; --text:#e8edf5; --text-muted:#6b7a96; --border:rgba(0,245,196,0.12); --border-hover:rgba(0,245,196,0.3); --radius:16px; --radius-sm:10px; }
+html,body { min-height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; }
+body::before { content:''; position:fixed; top:-20%; left:-10%; width:60%; height:60%; background:radial-gradient(ellipse,rgba(123,97,255,0.08) 0%,transparent 70%); pointer-events:none; z-index:0; }
+body::after { content:''; position:fixed; bottom:-20%; right:-10%; width:60%; height:60%; background:radial-gradient(ellipse,rgba(0,245,196,0.06) 0%,transparent 70%); pointer-events:none; z-index:0; }
+.page-content { width:100%; max-width:780px; margin:0 auto; padding:2rem 1rem; position:relative; z-index:1; }
+.page-header { display:flex; align-items:center; justify-content:space-between; padding:1.5rem 0; margin-bottom:2rem; border-bottom:1px solid var(--border); }
+.logo-text { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; color:var(--accent); }
+.btn-secondary { display:inline-flex; align-items:center; gap:.5rem; padding:.75rem 1.5rem; background:transparent; color:var(--text-muted); font-family:'DM Sans',sans-serif; font-size:.9rem; border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius-sm); cursor:pointer; text-decoration:none; transition:all .2s; }
+.btn-secondary:hover { border-color:var(--border-hover); color:var(--text); }
+.btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.85rem 2rem; background:var(--accent); color:#090e1a; font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700; border:none; border-radius:var(--radius-sm); cursor:pointer; text-decoration:none; transition:all .15s; }
+.btn-primary:hover { opacity:.85; transform:translateY(-1px); color:#090e1a; }
+.result-hero { text-align:center; padding:2.5rem 0 2rem; }
+.score-ring { display:inline-flex; align-items:center; justify-content:center; width:130px; height:130px; border-radius:50%; border:3px solid var(--accent); font-family:'Syne',sans-serif; font-size:2.8rem; font-weight:800; color:var(--accent); margin-bottom:1rem; box-shadow:0 0 40px rgba(0,245,196,0.25); animation:popIn .5s cubic-bezier(.175,.885,.32,1.275) both; }
+.result-cat-badge { display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .9rem; border-radius:20px; background:rgba(0,245,196,0.1); border:1px solid rgba(0,245,196,0.2); color:var(--accent); font-size:.8rem; font-weight:600; margin-bottom:1rem; }
+.result-label { font-size:.8rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:.5rem; }
+.result-msg { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; margin:.5rem 0 .25rem; }
+.result-sub { color:var(--text-muted); font-size:.95rem; margin-bottom:2rem; }
+.action-row { display:flex; gap:.75rem; justify-content:center; flex-wrap:wrap; }
+.review-list { display:flex; flex-direction:column; gap:.75rem; margin-bottom:2rem; }
+.review-item { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem 1.5rem; position:relative; overflow:hidden; animation:fadeUp .35s ease both; }
+.review-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:3px 0 0 3px; }
+.review-item.correct::before { background:var(--accent); }
+.review-item.wrong::before { background:var(--accent3); }
+.review-q { font-weight:500; margin-bottom:.75rem; font-size:.95rem; }
+.review-answers { display:flex; flex-direction:column; gap:.3rem; font-size:.85rem; }
+.label { color:var(--text-muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; }
+.answer-correct { color:var(--accent); font-weight:500; }
+.answer-wrong { color:var(--accent3); font-weight:500; }
+.answer-right-text { color:var(--accent2); font-weight:500; }
+.status-badge { display:inline-flex; align-items:center; gap:.3rem; padding:.2rem .7rem; border-radius:20px; font-size:.75rem; font-weight:600; float:right; }
+.status-badge.correct { background:rgba(0,245,196,0.1); color:var(--accent); border:1px solid rgba(0,245,196,0.2); }
+.status-badge.wrong { background:rgba(255,107,107,0.1); color:var(--accent3); border:1px solid rgba(255,107,107,0.2); }
+.section-title { font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:1.25rem; }
+@keyframes popIn { from{opacity:0;transform:scale(.6)} to{opacity:1;transform:scale(1)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+{% for i in range(1,16) %}.review-item:nth-child({{ i }}) { animation-delay: {{ i * 0.05 }}s; } {% endfor %}
+</style>
+</head>
+<body>
+<div class="page-content">
+  <div class="page-header">
+    <span class="logo-text">⚡ QuizApp</span>
+    <a href="/dashboard" class="btn-secondary">← Dashboard</a>
+  </div>
+  <div class="result-hero">
+    <div class="score-ring">{{ score }}/{{ total }}</div>
+    <p class="result-label">Kategori</p>
+    <div class="result-cat-badge">{{ cat.icon }} {{ cat.name }}</div>
+    {% set pct = (score / total * 100) | int %}
+    {% if pct == 100 %}
+    <h2 class="result-msg">🎉 Sempurna!</h2>
+    <p class="result-sub">Luar biasa! Kamu jawab semua dengan benar.</p>
+    {% elif pct >= 80 %}
+    <h2 class="result-msg">🔥 Keren Banget!</h2>
+    <p class="result-sub">Hampir sempurna, kerja bagus!</p>
+    {% elif pct >= 60 %}
+    <h2 class="result-msg">👍 Lumayan!</h2>
+    <p class="result-sub">Lebih dari separuh benar, terus belajar!</p>
+    {% elif pct >= 40 %}
+    <h2 class="result-msg">📚 Perlu Belajar Lagi</h2>
+    <p class="result-sub">Jangan menyerah, coba lagi yuk!</p>
+    {% else %}
+    <h2 class="result-msg">💪 Ayo Semangat!</h2>
+    <p class="result-sub">Belajar lagi dan buktikan kemampuanmu!</p>
+    {% endif %}
+    <div class="action-row">
+      <a href="/pilih" class="btn-primary">🔄 Main Lagi</a>
+      <a href="/leaderboard" class="btn-secondary">🏆 Leaderboard</a>
+    </div>
+  </div>
+  <p class="section-title">Pembahasan Soal</p>
+  <div class="review-list">
+    {% for item in review %}
+    <div class="review-item {{ 'correct' if item.is_correct else 'wrong' }}">
+      <span class="status-badge {{ 'correct' if item.is_correct else 'wrong' }}">
+        {{ '✓ Benar' if item.is_correct else '✗ Salah' }}
+      </span>
+      <p class="review-q">{{ item.question }}</p>
+      <div class="review-answers">
+        <span class="label">Jawabanmu</span>
+        <span class="{{ 'answer-correct' if item.is_correct else 'answer-wrong' }}">{{ item.user_answer or '(tidak dijawab)' }}</span>
+        {% if not item.is_correct %}
+        <span class="label" style="margin-top:.25rem">Jawaban Benar</span>
+        <span class="answer-right-text">{{ item.correct_answer }}</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</body>
+</html>

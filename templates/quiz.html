@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — QuizApp</title>
+<style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -251,3 +258,74 @@ h3 { font-size: 1.3rem; }
 .review-item:nth-child(3) { animation-delay: 0.15s; }
 .review-item:nth-child(4) { animation-delay: 0.2s; }
 .review-item:nth-child(5) { animation-delay: 0.25s; }
+
+</style>
+</head>
+<body>
+<div class="page-content">
+  <div class="page-header">
+    <span class="logo-text">⚡ QuizApp</span>
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      {% if cat %}
+      <span style="font-size:.85rem;color:var(--text-muted);background:var(--bg-card);border:1px solid var(--border);padding:.4rem .9rem;border-radius:20px;">{{ cat.icon }} {{ cat.name }}</span>
+      {% endif %}
+      <a href="/pilih" class="btn-secondary">← Ganti Kategori</a>
+    </div>
+  </div>
+  <div class="quiz-wrapper">
+    <div class="quiz-progress-bar">
+      <div class="quiz-progress-fill" style="width: 0%" id="progress-bar"></div>
+    </div>
+    <form method="POST" action="/submit" id="quiz-form">
+      {% for q in questions %}
+        {% set q_index = loop.index %}
+        <div class="quiz-question" id="q-{{ q_index }}" style="display: {% if loop.first %}block{% else %}none{% endif %}">
+          <p class="question-num">Soal {{ q_index }} dari {{ questions|length }}</p>
+          <p class="question-text">{{ q.question }}</p>
+          <ul class="options-list">
+            {% for opt in q.options %}
+            <li>
+              <label class="option-label">
+                <input type="radio" name="question_{{ q_index }}" value="{{ opt }}" required>
+                {{ opt }}
+              </label>
+            </li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="correct_{{ q_index }}" value="{{ q.correct_answer }}">
+          <input type="hidden" name="text_{{ q_index }}" value="{{ q.question }}">
+        </div>
+      {% endfor %}
+      <div style="display:flex; justify-content:space-between; gap:1rem;">
+        <button type="button" id="prev-btn" class="btn-secondary" style="width:auto; display:none;">← Sebelumnya</button>
+        <button type="button" id="next-btn" class="btn-primary" style="width:auto; flex:1">Selanjutnya →</button>
+        <button type="submit" id="submit-btn" class="btn-primary" style="width:auto; flex:1; display:none;">Selesai ✓</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  const total = {{ questions|length }};
+  let current = 1;
+  function updateUI() {
+    for (let i = 1; i <= total; i++) {
+      document.getElementById('q-' + i).style.display = (i === current) ? 'block' : 'none';
+    }
+    document.getElementById('prev-btn').style.display = current > 1 ? 'inline-flex' : 'none';
+    document.getElementById('next-btn').style.display = current < total ? 'inline-flex' : 'none';
+    document.getElementById('submit-btn').style.display = current === total ? 'inline-flex' : 'none';
+    document.getElementById('progress-bar').style.width = ((current - 1) / total * 100) + '%';
+  }
+  document.getElementById('next-btn').addEventListener('click', () => {
+    const radios = document.querySelectorAll(`input[name="question_${current}"]`);
+    const checked = Array.from(radios).some(r => r.checked);
+    if (!checked) { alert('Pilih jawaban dulu ya!'); return; }
+    if (current < total) { current++; updateUI(); }
+  });
+  document.getElementById('prev-btn').addEventListener('click', () => {
+    if (current > 1) { current--; updateUI(); }
+  });
+  updateUI();
+</script>
+</body>
+</html>

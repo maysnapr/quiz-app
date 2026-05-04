@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pilih Kategori — QuizApp</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #090e1a; --bg-card: #0f1726; --accent: #00f5c4; --accent2: #7b61ff;
+  --text: #e8edf5; --text-muted: #6b7a96;
+  --border: rgba(0,245,196,0.12); --border-hover: rgba(0,245,196,0.3);
+  --radius: 16px; --radius-sm: 10px;
+}
+html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
+body::before { content:''; position:fixed; top:-20%; left:-10%; width:60%; height:60%; background:radial-gradient(ellipse,rgba(123,97,255,0.08) 0%,transparent 70%); pointer-events:none; z-index:0; }
+body::after { content:''; position:fixed; bottom:-20%; right:-10%; width:60%; height:60%; background:radial-gradient(ellipse,rgba(0,245,196,0.06) 0%,transparent 70%); pointer-events:none; z-index:0; }
+.page-content { width:100%; max-width:960px; margin:0 auto; padding:2rem 1rem 4rem; position:relative; z-index:1; }
+.page-header { display:flex; align-items:center; justify-content:space-between; padding:1.5rem 0; margin-bottom:2rem; border-bottom:1px solid var(--border); }
+.logo-text { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; color:var(--accent); }
+.btn-secondary { display:inline-flex; align-items:center; gap:.5rem; padding:.75rem 1.5rem; background:transparent; color:var(--text-muted); font-family:'DM Sans',sans-serif; font-size:.9rem; border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius-sm); cursor:pointer; text-decoration:none; transition:all .2s; }
+.btn-secondary:hover { border-color:var(--border-hover); color:var(--text); }
+.section-title { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; text-align:center; margin-bottom:.5rem; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.section-sub { text-align:center; color:var(--text-muted); margin-bottom:2.5rem; }
+.jumlah-section { margin-bottom:2.5rem; text-align:center; }
+.jumlah-label { font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:1rem; font-weight:600; }
+.jumlah-options { display:inline-flex; gap:.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:.4rem; }
+.jumlah-btn { padding:.6rem 1.5rem; border-radius:8px; border:none; background:transparent; color:var(--text-muted); font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700; cursor:pointer; transition:all .2s; }
+.jumlah-btn.active { background:var(--accent); color:#090e1a; }
+.jumlah-btn:hover:not(.active) { color:var(--text); background:rgba(255,255,255,0.05); }
+
+/* Grup kategori */
+.group-section { margin-bottom:2.5rem; }
+.group-label { font-family:'Syne',sans-serif; font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:1rem; padding-left:.25rem; border-left:2px solid var(--accent); padding-left:.75rem; }
+.cat-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(170px,1fr)); gap:.85rem; }
+
+.cat-card {
+  background:var(--bg-card); border:2px solid var(--border); border-radius:var(--radius);
+  padding:1.25rem 1rem; text-align:center; cursor:pointer;
+  transition:all .22s cubic-bezier(.25,.8,.25,1); display:flex; flex-direction:column; align-items:center; gap:.5rem;
+  animation: fadeUp 0.3s ease both;
+}
+.cat-card:hover { transform:translateY(-4px); border-color: var(--border-hover); }
+.cat-card.selected { border-width:2px; }
+.cat-icon { font-size:2rem; }
+.cat-name { font-family:'Syne',sans-serif; font-size:.88rem; font-weight:700; color:var(--text); line-height:1.2; }
+.cat-desc { font-size:.72rem; color:var(--text-muted); line-height:1.4; }
+.selected-badge { font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; font-weight:700; padding:.2rem .6rem; border-radius:20px; opacity:0; transition:opacity .2s; margin-top:.1rem; }
+.cat-card.selected .selected-badge { opacity:1; }
+
+.start-area { text-align:center; margin-top:2rem; position:sticky; bottom:1.5rem; }
+.btn-start {
+  display:inline-flex; align-items:center; gap:.6rem;
+  padding:1rem 3rem; background:var(--accent); color:#090e1a;
+  font-family:'Syne',sans-serif; font-size:1rem; font-weight:800;
+  border:none; border-radius:var(--radius-sm); cursor:pointer; text-decoration:none;
+  transition:all .2s; letter-spacing:.02em;
+  box-shadow:0 0 30px rgba(0,245,196,0.3);
+}
+.btn-start:hover { opacity:.9; transform:translateY(-2px); color:#090e1a; box-shadow:0 0 40px rgba(0,245,196,0.4); }
+.hint-text { margin-top:.75rem; font-size:.8rem; color:var(--text-muted); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div class="page-content">
+  <div class="page-header">
+    <span class="logo-text">⚡ QuizApp</span>
+    <a href="/dashboard" class="btn-secondary">← Dashboard</a>
+  </div>
+
+  <h2 class="section-title">Pilih Kategori Quiz</h2>
+  <p class="section-sub">Pilih topik favoritmu dan mulai tantangan!</p>
+
+  <div class="jumlah-section">
+    <p class="jumlah-label">Jumlah Soal</p>
+    <div class="jumlah-options">
+      <button class="jumlah-btn active" onclick="setJumlah(5, this)">5 Soal</button>
+      <button class="jumlah-btn" onclick="setJumlah(10, this)">10 Soal</button>
+      <button class="jumlah-btn" onclick="setJumlah(15, this)">15 Soal</button>
+    </div>
+  </div>
+
+  {% for group_name, group_cats in groups.items() %}
+  <div class="group-section">
+    <p class="group-label">{{ group_name }}</p>
+    <div class="cat-grid">
+      {% for key, cat in group_cats %}
+      <div class="cat-card" onclick="selectCat('{{ key }}', this)"
+           style="--cat-color: {{ cat.color }};"
+           id="cat-{{ key }}"
+           data-key="{{ key }}">
+        <span class="cat-icon">{{ cat.icon }}</span>
+        <span class="cat-name">{{ cat.name }}</span>
+        <span class="cat-desc">{{ cat.desc }}</span>
+        <span class="selected-badge" style="background:{{ cat.color }}22; color:{{ cat.color }}; border:1px solid {{ cat.color }}44">✓ Dipilih</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="start-area">
+    <a id="start-btn" href="#" class="btn-start" style="pointer-events:none; opacity:.4">
+      Mulai Quiz ⚡
+    </a>
+    <p class="hint-text" id="hint-text">← Pilih kategori dulu ya!</p>
+  </div>
+</div>
+
+<script>
+let selectedCat = null;
+let selectedJumlah = 5;
+
+function setJumlah(n, btn) {
+  selectedJumlah = n;
+  document.querySelectorAll('.jumlah-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateStartBtn();
+}
+
+function selectCat(key, el) {
+  document.querySelectorAll('.cat-card').forEach(c => {
+    c.classList.remove('selected');
+    c.style.borderColor = '';
+    c.style.background = '';
+  });
+  selectedCat = key;
+  el.classList.add('selected');
+  const color = getComputedStyle(el).getPropertyValue('--cat-color').trim();
+  el.style.borderColor = color;
+  el.style.background = color + '11';
+  updateStartBtn();
+}
+
+function updateStartBtn() {
+  const btn = document.getElementById('start-btn');
+  const hint = document.getElementById('hint-text');
+  if (selectedCat) {
+    btn.href = `/quiz?kategori=${selectedCat}&jumlah=${selectedJumlah}`;
+    btn.style.pointerEvents = 'auto';
+    btn.style.opacity = '1';
+    hint.textContent = `Siap! ${selectedJumlah} soal kategori terpilih`;
+    hint.style.color = 'var(--accent)';
+  } else {
+    btn.href = '#';
+    btn.style.pointerEvents = 'none';
+    btn.style.opacity = '0.4';
+    hint.textContent = '← Pilih kategori dulu ya!';
+    hint.style.color = '';
+  }
+}
+</script>
+</body>
+</html>
